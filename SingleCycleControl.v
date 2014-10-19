@@ -52,11 +52,11 @@ output wire [3:0] ALUOp ;
 
 //assign RegDst      = 1'bx;
 //assign ALUSrc1     = 1'bx;
-assign ALUSrc2     = 1'bx;
+//assign ALUSrc2     = 1'bx;
 //assign MemToReg    = 1'bx;
-assign RegWrite    = 1'bx;
-assign MemRead     = 1'bx;
-assign MemWrite    = 1'bx;
+//assign MemRead     = 1'bx;
+//assign MemWrite    = 1'bx;
+//assign RegWrite    = 1'bx;
 //assign Jump        = 1'bx;
 //assign Branch      = 1'bx;
 //assign SignExtend  = 1'bx;
@@ -65,60 +65,89 @@ assign 	Jump       = (Opcode == `JOPCODE   ? 1'b1 : 1'b0 );
 assign 	Branch     = (Opcode == `BEQOPCODE ? 1'b1 : 1'b0 );
 //assign 	SignExtend = ( (Opcode == `ADDIOPCODE or Opcode == `SLTIOPCODE) ? 1'b1 : 1'b0 );
 assign  MemToReg   = ( Opcode == `LWOPCODE ? 1'b1 : 1'b0 );
-assign  RegDst     = ( Opcode == `RTYPEOPCODE ? 1'b1 : 1'b0 );
+assign MemRead     = ( Opcode == `LWOPCODE ? 1'b1 : 1'b0 );
+//assign  RegDst     = ( Opcode == `RTYPEOPCODE ? 1'b1 : 1'b0 );
+
 
 always@(*) begin
 	
 	casex(Opcode)
 	`ORIOPCODE  :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp   <= `OR  ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b0 ;
 	end
 	`ADDIOPCODE :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp   <= `ADD ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b1 ;
 	end
 	`ADDIUOPCODE:  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `ADDU  ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b0 ;
 	end
 	`ANDIOPCODE :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `AND   ; 
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b0 ;
 	end
         `LUIOPCODE  :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `LUI   ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'bx ;
 	end
         `SLTIOPCODE :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `SLT   ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b1 ;
 	end
         `SLTIUOPCODE:  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `SLTU  ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b0 ;
 	end
         `XORIOPCODE :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `XOR   ;
 		ALUSrc1 <= 1'b0 ;
 		ALUSrc2 <= 1'b1 ;
 		SignExtend <= 1'b0 ;
 	end
 	`RTYPEOPCODE:  begin
+		MemWrite  <= 1'b0 ;
+		RegDst <= 1'b1 ;
+		RegWrite   <= 1'b1;
 		SignExtend <= 1'bx ;
 		ALUOp <= 4'b1111;
 		case (FuncCode)
@@ -141,30 +170,45 @@ always@(*) begin
 		endcase
 	end
 	`BEQOPCODE: begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b0;
+		RegDst <= 1'bx ;
 		ALUOp <= `SUB ;
 		ALUSrc2 <= 1'b0 ;
 		ALUSrc1 <= 1'bx ;
 		SignExtend <= 1'b1 ;
 	end
 	`SWOPCODE:  begin
+		MemWrite  <= 1'b1 ;
+		RegWrite   <= 1'b0;
+		RegDst <= 1'bx ;
 		ALUop <= `ADD ;
 		SignExtend <= 1'b1 ;
 		ALUSrc2 <= 1'b1; 
 		ALUSrc1 <= 1'b0 ;
 	end
 	`LWOPCODE:  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b1;
+		RegDst <= 1'b0 ;
 		ALUOp <= `ADD ;
 		SignExtend <= 1'b1 ;
 		ALUSrc2 <= 1'b1;
 		ALUSrc1 <= 1'b0 ;
 	end
 	`JOPCODE:  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b0;
+		RegDst <= 1'bx ;
 		ALUOp <= 4'bxxxx;
 		SignExtend <= 1'bx;
 		ALUSrc1 <= 1'bx;
 		ALUSrc2 <= 1'bx ;
 	end
 	default     :  begin
+		MemWrite  <= 1'b0 ;
+		RegWrite   <= 1'b0;
+		RegDst <= 1'bx ;
 		ALUOp <= 4'bxxxx;
 		SignExtend <= 1'bx ;
 		ALUSrc1 <= 1'bx;
