@@ -87,9 +87,10 @@ assign pc_plus4 = pc + 32'd4 ;
 
 always@(negedge CLK or Reset_L)begin
 	if(Reset_L == 1'b0)begin
-		pc <= 32'b0 ;
+		pc <= startPC ;
+	end else begin
+		pc <= pc_next ;
 	end
-	pc <= pc_next ;
 end
 
 endmodule
