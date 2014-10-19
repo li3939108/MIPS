@@ -71,7 +71,7 @@ module SingleCycleProcTest_v;
 		Reset_L = 0; startPC = 32'hA0;
 		#(1 * `ClockPeriod);
 		Reset_L = 1;
-		#(26 * `ClockPeriod);
+		#(25 * `ClockPeriod);
 		passTest(dMemOut, 32'hfeedbeef, "Result 1 of Program 3", passed);
 		#(1 * `ClockPeriod);
 		passTest(dMemOut, 32'hfeedb48f, "Result 2 of Program 3", passed);
@@ -112,4 +112,3 @@ module SingleCycleProcTest_v;
    end
       
 endmodule
-

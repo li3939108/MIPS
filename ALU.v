@@ -23,14 +23,14 @@ input wire [3:0] ALUCtrl ;
 output wire Zero ;
 
 wire less;
-wire [63:0] extendedBusA ;
-wire [31:0] shiftedExtendedBusA ;
+wire [63:0] extendedBusB ;
+wire [31:0] shiftedExtendedBusB ;
 
 
 assign Zero = (BusW == 32'b0 ? 1'b1: 1'b0);
 assign less = (BusA < BusB  ? 1'b1 : 1'b0) ;
-assign extendedBusA = {{32{BusA[31]}} , BusA[31:0]} ;
-assign shiftedExtendedBusA = extendedBusA >> BusB ;
+assign extendedBusB = {{32{BusB[31]}} , BusB[31:0]} ;
+assign shiftedExtendedBusB = extendedBusB >> BusA ;
 
 always@(*)begin	
 	
@@ -39,15 +39,15 @@ always@(*)begin
 	`OR:    BusW <= BusA | BusB;
 	`ADD:   BusW <= BusA + BusB;
 	`ADDU:  BusW <= BusA + BusB;
-	`SLL:   BusW <= BusA << BusB;
-	`SRL:   BusW <= BusA >> BusB;
+	`SLL:   BusW <= BusB << BusA;
+	`SRL:   BusW <= BusB >> BusA;
 	`SUB:   BusW <= BusA - BusB;
 	`SUBU:  BusW <= BusA - BusB;
 	`XOR:   BusW <= BusA ^ BusB;
 	`NOR:   BusW <= ~(BusA | BusB);
 	`SLT:   BusW <= (( BusA - BusB ) & {1'b1, 31'b0} )>> 31 ;
 	`SLTU:  BusW <= less ;
-	`SRA:   BusW <= shiftedExtendedBusA;
+	`SRA:   BusW <= shiftedExtendedBusB;
 	`LUI:   BusW <= BusB << 16 ;
 	default:BusW <= 32'hxxxxxxxx;
 	endcase

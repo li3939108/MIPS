@@ -52,7 +52,7 @@ module ALUTest_v;
 		
 		//ADD YOUR TEST VECTORS FROM THE PRELAB HERE	
 
-		{BusA, BusB, ALUCtrl} = {32'hFFFF1234, 32'd6, 4'd4}; #40; passTest({Zero, BusW}, 33'h003FFFC48, "SRL 0xFFFF1234,6", passed);
+		{BusA, BusB, ALUCtrl} = { 32'd6,32'hFFFF1234, 4'd4}; #40; passTest({Zero, BusW}, 33'h003FFFC48, "SRL 0xFFFF1234,6", passed);
 		{BusA, BusB, ALUCtrl} = {32'h00000000, 32'h00000000, 4'd8}; #40; passTest({Zero, BusW}, 33'h100000000, "ADDU 0,0", passed);
 		{BusA, BusB, ALUCtrl} = {32'h00000000, 32'hFFFFFFFF, 4'd8}; #40; passTest({Zero, BusW}, 33'h0FFFFFFFF, "ADDU 0,-1", passed);
 		{BusA, BusB, ALUCtrl} = {32'hFFFFFFFF, 32'h00000000, 4'd8}; #40; passTest({Zero, BusW}, 33'h0FFFFFFFF, "ADDU -1,0", passed);
@@ -69,9 +69,9 @@ module ALUTest_v;
 		{BusA, BusB, ALUCtrl} = {32'hFFFFFFFF, 32'h00000000, 4'd11}; #40; passTest({Zero, BusW}, 33'h100000000, "SLTU -1,0", passed);
 		{BusA, BusB, ALUCtrl} = {32'hF0F0F0F0, 32'h0000FFFF, 4'd12}; #40; passTest({Zero, BusW}, 33'h00F0F0000, "NOR 0xF0F0F0F0,0x0000FFFF", passed);
 		{BusA, BusB, ALUCtrl} = {32'h12345678, 32'h87654321, 4'd12}; #40; passTest({Zero, BusW}, 33'h0688aa886, "NOR 0x12345678,0x87654321", passed);
-		{BusA, BusB, ALUCtrl} = {32'h00000001, 32'd3, 4'd13}; #40; passTest({Zero, BusW}, 33'h100000000, "SRA 0x00000001,3", passed);
-		{BusA, BusB, ALUCtrl} = {32'h00001234, 32'd6, 4'd13}; #40; passTest({Zero, BusW}, 33'h000000048, "SRA 0x00001234,6", passed);
-		{BusA, BusB, ALUCtrl} = {32'hFFFF1234, 32'd6, 4'd13}; #40; passTest({Zero, BusW}, 33'h0FFFFFC48, "SRA 0xFFFF1234,6", passed);
+		{BusA, BusB, ALUCtrl} = { 32'd3,32'h00000001, 4'd13}; #40; passTest({Zero, BusW}, 33'h100000000, "SRA 0x00000001,3", passed);
+		{BusA, BusB, ALUCtrl} = { 32'd6,32'h00001234, 4'd13}; #40; passTest({Zero, BusW}, 33'h000000048, "SRA 0x00001234,6", passed);
+		{BusA, BusB, ALUCtrl} = { 32'd6,32'hFFFF1234, 4'd13}; #40; passTest({Zero, BusW}, 33'h0FFFFFC48, "SRA 0xFFFF1234,6", passed);
 		{BusA, BusB, ALUCtrl} = {32'h0, 32'h12345678, 4'd14}; #40; passTest({Zero, BusW}, 33'h056780000, "LUI 0x12345678", passed);
 		{BusA, BusB, ALUCtrl} = {32'h0, 32'h00001234, 4'd14}; #40; passTest({Zero, BusW}, 33'h012340000, "LUI 0x00001234", passed);
 

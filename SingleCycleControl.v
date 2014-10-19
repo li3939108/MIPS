@@ -152,22 +152,19 @@ always@(*) begin
 		RegWrite   <= 1'b1;
 		SignExtend <= 1'bx ;
 		ALUOp <= 4'b1111;
+		ALUSrc2 <= 1'b0 ;
 		case (FuncCode)
 		`SLLFunc : begin
 			ALUSrc1 <= 1'b1 ;
-			ALUSrc2 <= 1'b1 ;
 		end
 		`SRLFunc : begin
 			ALUSrc1 <= 1'b1 ;
-			ALUSrc2 <= 1'b1 ;
 		end
-		`SRLFunc : begin
+		`SRAFunc : begin
 			ALUSrc1 <= 1'b1 ;
-			ALUSrc2 <= 1'b1 ;
 		end
 		default  : begin
-			ALUSrc1 <= 1'bx ;
-			ALUSrc2 <= 1'b0 ;
+			ALUSrc1 <= 1'b0 ;
 		end
 		endcase
 	end
@@ -177,7 +174,7 @@ always@(*) begin
 		RegDst <= 1'bx ;
 		ALUOp <= `SUB ;
 		ALUSrc2 <= 1'b0 ;
-		ALUSrc1 <= 1'bx ;
+		ALUSrc1 <= 1'b0 ;
 		SignExtend <= 1'b1 ;
 	end
 	`SWOPCODE:  begin
@@ -204,7 +201,7 @@ always@(*) begin
 		RegDst <= 1'bx ;
 		ALUOp <= 4'bxxxx;
 		SignExtend <= 1'bx;
-		ALUSrc1 <= 1'bx;
+		ALUSrc1 <= 1'b0;
 		ALUSrc2 <= 1'bx ;
 	end
 	default     :  begin

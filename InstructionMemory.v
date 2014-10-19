@@ -160,6 +160,7 @@ module InstructionMemory(Data, Address);
 			32'hBC: Data = 32'h3085f5a0;
 			32'hC0: Data = 32'hac050030;
 			32'hC4: Data = 32'h00042940;
+
 			32'hC8: Data = 32'hac050034;
 			32'hCC: Data = 32'h00042942;
 			32'hD0: Data = 32'hac050038;
@@ -170,11 +171,13 @@ module InstructionMemory(Data, Address);
 			32'hE4: Data = 32'h28a5ffff;
 			32'hE8: Data = 32'hac050044;
 			32'hEC: Data = 32'h2c850001;
+
 			32'hF0: Data = 32'hac050048;
 			32'hF4: Data = 32'h2ca5ffff;
 			32'hF8: Data = 32'hac05004c;
 			32'hFC: Data = 32'h3885f5a0;
 			32'h100: Data = 32'hac050050;
+
 			32'h104: Data = 32'h8c040024;
 			32'h108: Data = 32'h8c050028;
 			32'h10C: Data = 32'h8c05002c;

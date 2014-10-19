@@ -55,8 +55,8 @@ RegisterFile rf(
 	.RW(RW)
 );
 
-assign ALUinA = BusA ;//(ALUSrc1 == 1'b1 ? {27'b0, im_DataOut[10:6]} : BusA ) ;
-assign ALUinB = (ALUSrc2 == 1'b1 ? (ALUSrc1 == 1'b1 ? {27'b0, im_DataOut[10:6]} : signExtended) : BusB ) ;
+assign ALUinA = (ALUSrc1 == 1'b1 ? {27'b0, im_DataOut[10:6]} : BusA ) ;
+assign ALUinB = (ALUSrc2 == 1'b1 ? signExtended : BusB ) ;
 ALU alu(
 	.BusW(ALUout), 
 	.Zero(Zero), 
