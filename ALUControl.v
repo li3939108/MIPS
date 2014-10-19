@@ -46,14 +46,14 @@
 `define SRA 4'b1101
 `define LUI 4'b1110
 
-module ALUControl(ALUCtrl, ALUop, FuncCode);
+module ALUControl(ALUCtrl, ALUOp, FuncCode);
 
-input wire [3:0] ALUop;
+input wire [3:0] ALUOp;
 input wire [5:0] FuncCode ;
 output reg [3:0] ALUCtrl ;
 
 always@(*) begin
-	if(ALUop == 4'b1111)begin
+	if(ALUOp == 4'b1111)begin
 		case (FuncCode)
 		`SLLFunc : ALUCtrl <= `SLL   ;
 		`SRLFunc : ALUCtrl <= `SRL   ;
@@ -71,7 +71,7 @@ always@(*) begin
 		default  : ALUCtrl <= 4'bxxxx;
 		endcase 
 	end else begin
-		ALUCtrl <= ALUop ;	
+		ALUCtrl <= ALUOp ;	
 	end
 end
 endmodule

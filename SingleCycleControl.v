@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 
+
 `define SLLFunc  6'b000000
 `define SRLFunc  6'b000010
 `define SRAFunc  6'b000011
@@ -47,8 +48,9 @@ module SingleCycleControl(RegDst, ALUSrc1,ALUSrc2, MemToReg, RegWrite,
 MemRead, MemWrite, Branch, Jump, SignExtend, ALUOp, Opcode, FuncCode);
 
 input wire [5:0] Opcode, FuncCode ;
-output wire RegDst, ALUSrc1, ALUSrc2, MemToReg, RegWrite, MemRead, MemWrite, Branch, Jump, SignExtend ;
-output wire [3:0] ALUOp ;
+output reg RegDst, ALUSrc1, ALUSrc2, RegWrite, MemWrite, SignExtend ;
+output wire Jump, Branch, MemToReg, MemRead ;
+output reg [3:0] ALUOp ;
 
 //assign RegDst      = 1'bx;
 //assign ALUSrc1     = 1'bx;
@@ -182,7 +184,7 @@ always@(*) begin
 		MemWrite  <= 1'b1 ;
 		RegWrite   <= 1'b0;
 		RegDst <= 1'bx ;
-		ALUop <= `ADD ;
+		ALUOp <= `ADD ;
 		SignExtend <= 1'b1 ;
 		ALUSrc2 <= 1'b1; 
 		ALUSrc1 <= 1'b0 ;

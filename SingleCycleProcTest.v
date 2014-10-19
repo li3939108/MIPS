@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "SingleCycleProc.v"
 
 
 `define STRLEN 32

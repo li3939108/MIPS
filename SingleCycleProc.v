@@ -1,4 +1,10 @@
 `timescale 1 ns / 1 ps
+`include "ALU.v"
+`include "RegisterFile.v"
+`include "DataMemory.v"
+`include "ALUControl.v"
+`include "SingleCycleControl.v"
+`include "InstructionMemory.v"
 
 module SingleCycleProc(CLK, Reset_L, startPC, dMemOut);
 
@@ -7,11 +13,12 @@ input wire [31:0] startPC ;
 output wire [31:0] dMemOut ;
 
 wire [31:0] im_DataOut, im_Address, BusW, dm_DataOut, dm_DataIn, ALUout, BusA, BusB, ALUinA, ALUinB, 
-	signExtended, pc, pc_plus4, pc_after_branch, pc_next;
+	signExtended, pc_plus4, pc_after_branch, pc_next;
+reg [31:0] pc;
 wire [4:0] RW;
-wire RegDst, RegSrc, MemRead, MemWrite, SignExtend, BranchCtrl, Zero, BranchSel, Jump, RegWrite;
+wire RegDst, RegSrc, MemRead, MemWrite, SignExtend, BranchCtrl, Zero, BranchSel, Jump, RegWrite, ALUSrc1, ALUSrc2;
 wire [5:0] Opcode, FuncCode ;
-wire [3:0] ALUop, ALUCtrl ;
+wire [3:0] ALUOp, ALUCtrl ;
 
 assign dMemOut = dm_DataOut ;
 
@@ -38,7 +45,7 @@ DataMemory dm(
 assign RW = (RegDst == 1'b1 ? im_DataOut[15:11] : im_DataOut[20:16] );
 assign BusW = (RegSrc == 1'b1 ? dm_DataOut : ALUout) ;
 RegisterFile rf(
-	.CLK(CLK), 
+	.Clk(CLK), 
 	.RegWr(RegWrite), 
 	.BusA(BusA), 
 	.BusB(BusB), 
@@ -61,7 +68,7 @@ ALU alu(
 assign FuncCode = signExtended[5:0] ;
 ALUControl ALUCtl(
 	.ALUCtrl(ALUCtrl), 
-	.ALUop(ALUop), 
+	.ALUOp(ALUOp), 
 	.FuncCode(FuncCode) 
 ) ;
 
@@ -76,7 +83,7 @@ SingleCycleControl scc(
 	.Branch(BranchCtrl), 
 	.Jump(Jump), 
 	.SignExtend(SignExtend), 
-	.ALUop(ALUop), 
+	.ALUOp(ALUOp), 
 	.Opcode(im_DataOut[31:26]),
 	.FuncCode(FuncCode)
 );
