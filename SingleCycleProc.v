@@ -12,12 +12,12 @@ input wire CLK, Reset_L ;
 input wire [31:0] startPC ;
 output wire [31:0] dMemOut ;
 
-wire [31:0] im_DataOut, im_Address, BusW, dm_DataOut, dm_DataIn, ALUout, BusA, BusB, ALUinA, ALUinB, 
+wire [31:0] im_DataOut, BusW, dm_DataOut, dm_DataIn, ALUout, BusA, BusB, ALUinA, ALUinB, 
 	signExtended, pc_plus4, pc_after_branch, pc_next;
 reg [31:0] pc;
 wire [4:0] RW;
 wire RegDst, RegSrc, MemRead, MemWrite, SignExtend, BranchCtrl, Zero, BranchSel, Jump, RegWrite, ALUSrc1, ALUSrc2;
-wire [5:0] Opcode, FuncCode ;
+wire [5:0]  FuncCode ;
 wire [3:0] ALUOp, ALUCtrl ;
 
 assign dMemOut = dm_DataOut ;
@@ -26,10 +26,9 @@ assign signExtended = (SignExtend == 1'b1 ?
 	{{16{im_DataOut[15]}}, im_DataOut[15:0]} : 
 	{16'b0,im_DataOut[15:0]}) ;
 
-assign im_Address = pc ;
 InstructionMemory im(
 	.Data(im_DataOut), 
-	.Address(im_Address)
+	.Address(pc)
 );
 
 assign dm_DataIn = BusB ;
@@ -93,7 +92,7 @@ assign pc_after_branch = (BranchSel == 1'b1 ? (signExtended << 2 ) + pc_plus4 : 
 assign pc_next = (Jump == 1'b1 ?  {pc_plus4[31:28], im_DataOut[25:0], 2'b00} : pc_after_branch ) ;
 assign pc_plus4 = pc + 32'd4 ;
 
-always@(negedge CLK or Reset_L)begin
+always@(negedge CLK or negedge Reset_L)begin
 	if(Reset_L == 1'b0)begin
 		pc <= startPC ;
 	end else begin
