@@ -1,0 +1,95 @@
+`timescale 1 ns / 1 ps
+
+module SingleCycleProc(CLK, Reset_L, startPC, dMemOut);
+
+input wire CLK, Reset_L ;
+input wire [31:0] startPC ;
+output wire [31:0] dMemOut ;
+
+wire [31:0] im_DataOut, im_Address, BusW, dm_DataOut, dm_DataIn, ALUout, BusA, BusB, ALUinA, ALUinB, 
+	signExtended, pc, pc_plus4, pc_after_branch, pc_next;
+wire [4:0] RW;
+wire RegDst, RegSrc, MemRead, MemWrite, SignExtend, BranchCtrl, Zero, BranchSel, Jump, RegWrite;
+wire [5:0] Opcode, FuncCode ;
+wire [3:0] ALUop, ALUCtrl ;
+
+assign dMemOut = dm_DataOut ;
+
+assign signExtended = (SignExtend == 1'b1 ? 
+	{{16{im_DataOut[15]}}, im_DataOut[15:0]} : 
+	{16'b0,im_DataOut[15:0]}) ;
+
+assign im_Address = pc ;
+InstructionMemory im(
+	.Data(im_DataOut), 
+	.Address(im_Address)
+);
+
+assign dm_DataIn = BusB ;
+DataMemory dm(
+	.ReadData(dm_DataOut), 
+	.Address(ALUout), 
+	.WriteData(dm_DataIn), 
+	.MemoryRead(MemRead), 
+	.MemoryWrite(MemWrite), 
+	.Clock(CLK)
+);
+
+assign RW = (RegDst == 1'b1 ? im_DataOut[15:11] : im_DataOut[20:16] );
+assign BusW = (RegSrc == 1'b1 ? dm_DataOut : ALUout) ;
+RegisterFile rf(
+	.CLK(CLK), 
+	.RegWr(RegWrite), 
+	.BusA(BusA), 
+	.BusB(BusB), 
+	.BusW(BusW), 
+	.RA(im_DataOut[25:21]), 
+	.RB(im_DataOut[20:16]), 
+	.RW(RW)
+);
+
+assign ALUinA = (ALUSrc1 == 1'b1 ? {27'b0, im_DataOut[10:6]} : BusA ) ;
+assign ALUinB = (ALUSrc1 == 1'b1 ? signExtended : BusB ) ;
+ALU alu(
+	.BusW(ALUout), 
+	.Zero(Zero), 
+	.BusA(ALUinA), 
+	.BusB(ALUinB), 
+	.ALUCtrl(ALUCtrl)
+);
+
+assign FuncCode = signExtended[5:0] ;
+ALUControl ALUCtl(
+	.ALUCtrl(ALUCtrl), 
+	.ALUop(ALUop), 
+	.FuncCode(FuncCode) 
+) ;
+
+SingleCycleControl scc(
+	.RegDst(RegDst), 
+	.ALUSrc1(ALUSrc1),
+	.ALUSrc2(ALUSrc2), 
+	.MemToReg(RegSrc), 
+	.RegWrite(RegWrite),
+	.MemRead(MemRead), 
+	.MemWrite(MemWrite), 
+	.Branch(BranchCtrl), 
+	.Jump(Jump), 
+	.SignExtend(SignExtend), 
+	.ALUop(ALUop), 
+	.Opcode(im_DataOut[31:26])
+);
+
+assign BranchSel = BranchCtrl & Zero ;
+assign pc_after_branch = (BranchSel == 1'b1 ? (signExtended << 2 ) + pc_plus4 : pc_plus4 ) ;
+assign pc_next = (Jump == 1'b1 ?  {pc_plus4[31:28], im_DataOut[25:0], 2'b00} : pc_after_branch ) ;
+assign pc_plus4 = pc + 32'd4 ;
+
+always@(negedge CLK or Reset_L)begin
+	if(Reset_L == 1'b0)begin
+		pc <= 32'b0 ;
+	end
+	pc <= pc_next ;
+end
+
+endmodule
