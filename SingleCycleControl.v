@@ -1,5 +1,19 @@
 `timescale 1ns / 1ps
 
+`define SLLFunc  6'b000000
+`define SRLFunc  6'b000010
+`define SRAFunc  6'b000011
+`define ADDFunc  6'b100000
+`define ADDUFunc 6'b100001
+`define SUBFunc  6'b100010
+`define SUBUFunc 6'b100011
+`define ANDFunc  6'b100100
+`define ORFunc   6'b100101
+`define XORFunc  6'b100110
+`define NORFunc  6'b100111
+`define SLTFunc  6'b101010
+`define SLTUFunc 6'b101011
+
 `define AND  4'b0000
 `define OR   4'b0001
 `define ADD  4'b0010
@@ -22,43 +36,140 @@
 `define JOPCODE     6'b000010
 `define ORIOPCODE   6'b001101
 `define ADDIOPCODE  6'b001000
-`define ADDIUOPCODE 6'b001001
 `define ANDIOPCODE  6'b001100
 `define LUIOPCODE   6'b001111
 `define SLTIOPCODE  6'b001010
-`define SLTIUOPCODE 6'b001011
 `define XORIOPCODE  6'b001110
+`define ADDIUOPCODE 6'b001001
+`define SLTIUOPCODE 6'b001011
 
 module SingleCycleControl(RegDst, ALUSrc1,ALUSrc2, MemToReg, RegWrite,
-MemRead, MemWrite, Branch, Jump, SignExtend, ALUOp, Opcode);
+MemRead, MemWrite, Branch, Jump, SignExtend, ALUOp, Opcode, FuncCode);
 
-input wire [5:0] Opcode ;
+input wire [5:0] Opcode, FuncCode ;
 output wire RegDst, ALUSrc1, ALUSrc2, MemToReg, RegWrite, MemRead, MemWrite, Branch, Jump, SignExtend ;
 output wire [3:0] ALUOp ;
 
-assign RegDst      = 1'bx;
-assign ALUSrc1     = 1'bx;
+//assign RegDst      = 1'bx;
+//assign ALUSrc1     = 1'bx;
 assign ALUSrc2     = 1'bx;
-assign MemToReg    = 1'bx;
+//assign MemToReg    = 1'bx;
 assign RegWrite    = 1'bx;
 assign MemRead     = 1'bx;
 assign MemWrite    = 1'bx;
-assign Branch      = 1'bx;
-assign Jump        = 1'bx;
-assign SignExtend  = 1'bx;
+//assign Jump        = 1'bx;
+//assign Branch      = 1'bx;
+//assign SignExtend  = 1'bx;
+
+assign 	Jump       = (Opcode == `JOPCODE   ? 1'b1 : 1'b0 );
+assign 	Branch     = (Opcode == `BEQOPCODE ? 1'b1 : 1'b0 );
+//assign 	SignExtend = ( (Opcode == `ADDIOPCODE or Opcode == `SLTIOPCODE) ? 1'b1 : 1'b0 );
+assign  MemToReg   = ( Opcode == `LWOPCODE ? 1'b1 : 1'b0 );
+assign  RegDst     = ( Opcode == `RTYPEOPCODE ? 1'b1 : 1'b0 );
 
 always@(*) begin
+	
 	casex(Opcode)
-	`ORIOPCODE  :  ALUOp <= `OR    ;
-	`ADDIOPCODE :  ALUOp <= `ADD   ;
-	`ADDIUOPCODE:  ALUOp <= `ADDU  ;
-	`ANDIOPCODE :  ALUOp <= `AND   ; 
-        `LUIOPCODE  :  ALUOp <= `LUI   ;
-        `SLTIOPCODE :  ALUOp <= `SLT   ;
-        `SLTIUOPCODE:  ALUOp <= `SLTU  ;
-        `XORIOPCODE :  ALUOp <= `XOR   ;
-	`RTYPEOPCODE:  ALUOp <= 4'b1111;
-	default     :  ALUOp <= 4'bxxxx;
+	`ORIOPCODE  :  begin
+		ALUOp   <= `OR  ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b0 ;
+	end
+	`ADDIOPCODE :  begin
+		ALUOp   <= `ADD ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b1 ;
+	end
+	`ADDIUOPCODE:  begin
+		ALUOp <= `ADDU  ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b0 ;
+	end
+	`ANDIOPCODE :  begin
+		ALUOp <= `AND   ; 
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b0 ;
+	end
+        `LUIOPCODE  :  begin
+		ALUOp <= `LUI   ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'bx ;
+	end
+        `SLTIOPCODE :  begin
+		ALUOp <= `SLT   ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b1 ;
+	end
+        `SLTIUOPCODE:  begin
+		ALUOp <= `SLTU  ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b0 ;
+	end
+        `XORIOPCODE :  begin
+		ALUOp <= `XOR   ;
+		ALUSrc1 <= 1'b0 ;
+		ALUSrc2 <= 1'b1 ;
+		SignExtend <= 1'b0 ;
+	end
+	`RTYPEOPCODE:  begin
+		SignExtend <= 1'bx ;
+		ALUOp <= 4'b1111;
+		case (FuncCode)
+		`SLLFunc : begin
+			ALUSrc1 <= 1'b1 ;
+			ALUSrc2 <= 1'b1 ;
+		end
+		`SRLFunc : begin
+			ALUSrc1 <= 1'b1 ;
+			ALUSrc2 <= 1'b1 ;
+		end
+		`SRLFunc : begin
+			ALUSrc1 <= 1'b1 ;
+			ALUSrc2 <= 1'b1 ;
+		end
+		default  : begin
+			ALUSrc1 <= 1'bx ;
+			ALUSrc2 <= 1'b0 ;
+		end
+		endcase
+	end
+	`BEQOPCODE: begin
+		ALUOp <= `SUB ;
+		ALUSrc2 <= 1'b0 ;
+		ALUSrc1 <= 1'bx ;
+		SignExtend <= 1'b1 ;
+	end
+	`SWOPCODE:  begin
+		ALUop <= `ADD ;
+		SignExtend <= 1'b1 ;
+		ALUSrc2 <= 1'b1; 
+		ALUSrc1 <= 1'b0 ;
+	end
+	`LWOPCODE:  begin
+		ALUOp <= `ADD ;
+		SignExtend <= 1'b1 ;
+		ALUSrc2 <= 1'b1;
+		ALUSrc1 <= 1'b0 ;
+	end
+	`JOPCODE:  begin
+		ALUOp <= 4'bxxxx;
+		SignExtend <= 1'bx;
+		ALUSrc1 <= 1'bx;
+		ALUSrc2 <= 1'bx ;
+	end
+	default     :  begin
+		ALUOp <= 4'bxxxx;
+		SignExtend <= 1'bx ;
+		ALUSrc1 <= 1'bx;
+		ALUSrc2 <= 1'bx ;
+	end
 	endcase
 end
 

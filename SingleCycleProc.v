@@ -77,7 +77,8 @@ SingleCycleControl scc(
 	.Jump(Jump), 
 	.SignExtend(SignExtend), 
 	.ALUop(ALUop), 
-	.Opcode(im_DataOut[31:26])
+	.Opcode(im_DataOut[31:26]),
+	.FuncCode(FuncCode)
 );
 
 assign BranchSel = BranchCtrl & Zero ;
